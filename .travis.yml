@@ -1,0 +1,14 @@
+os:
+  - linux
+
+language: go
+
+go:
+  - 1.9
+
+services:
+  - docker
+
+script:
+  - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o certificate-controller .
+  - docker build -t certificate-controller:1.0 .
