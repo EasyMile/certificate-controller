@@ -7,7 +7,7 @@ services:
 - docker
 script:
 - ./script/run build
-- USERNAME=$DOCKER_HUB_USERNAME PASSWORD=$DOCKER_HUB_PASSWORD ./script/run push
+- if [ ! -z $TRAVIS_TAG ]; then ./script/run push; fi
 
 env:
   global:

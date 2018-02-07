@@ -35,7 +35,7 @@ func main() {
 	controllerClass := os.Getenv("CERTIFICATE_CONTROLLER_CLASS")
 	if controllerClass == "" {
 		logrus.WithFields(logrus.Fields{"owner-id": controllerClass}).Error("Undefined owner identifier. Using default")
-		controllerClass = "default-owner"
+		controllerClass = "certificate-controller"
 	}
 	logrus.WithFields(logrus.Fields{"arn": certificateArn}).Info("Certificate ARN found")
 	var err error
