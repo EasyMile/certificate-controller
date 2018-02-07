@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+IMAGE_REPO=easymile
+IMAGE_NAME=certificate-controller
+
+if [ -z $TRAVIS_TAG ]; then
+  TAG="${TRAVIS_COMMIT:0:7}"
+else
+  TAG="$TRAVIS_TAG"
+fi
+
+build()
+{
+  CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o certificate-controller
+  docker build -t "$IMAGE_REPO/$IMAGE_NAME:$TAG" .
+}
+
+push()
+{
+  if [ ! -z "$USERNAME" ] && [ ! -z "$PASSWORD" ]; then
+    docker login -u "$USERNAME" -p "$PASSWORD"
+    docker push "$IMAGE_REPO/$IMAGE_NAME:$TAG"
+    docker tag "$IMAGE_REPO/$IMAGE_NAME:$TAG" "$IMAGE_REPO/$IMAGE_NAME:latest"
+    docker push "$IMAGE_REPO/$IMAGE_NAME:latest"
+  fi
+}
+
+case "$1" in
+  build)
+    build
+    ;;
+  push)
+    push
+    ;;
+  *)
+    echo "$1 Didn't match anything"
+esac
