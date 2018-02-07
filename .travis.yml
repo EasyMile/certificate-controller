@@ -1,14 +1,15 @@
 os:
-  - linux
-
+- linux
 language: go
-
 go:
-  - 1.9
-
+- 1.9
 services:
-  - docker
-
+- docker
 script:
-  - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o certificate-controller .
-  - docker build -t certificate-controller:1.0 .
+- ./script/run build
+- USERNAME=$DOCKER_HUB_USERNAME PASSWORD=$DOCKER_HUB_PASSWORD ./script/run push
+
+env:
+  global:
+  - secure: J3r26kzZ2d7y6LFBr/yMI59gafiasR0sSeWPm4GDD17yNspaT1CABQT9SZwmmOPi1XjRQ38vM03O/l/uHi5cQ6AR0Az8ErGiYEikZPwP8zwjUa5lriAYiCGGSTqb0X+RA/f7h1VxYp2OSjL8WCd3RHA3bY2ZAKQAMK6tMV0hFyUqqG6RUN3hKKQzfdHF7TFo7lgO+xq/8ARDGM0XVjehdmA1i64ux4NiBOZSzHdAPVg2dQ5px+bfuPlQov+l0Q008gxNYkhMxMi3xMmsy7DIX4gCdph62jEJohTXJL7pqvrW+Y4bUHN5MuVFGqVrQFzCGNWPlNixhxAPYwdMOUEVvHTe51XrRZxNeBLwpct2lH0UlD5nIdqNYHCWiAWCgWOmZEQHbpeX45n3DjUBOaSyG0K2fTewpB7OftlcBvX+61UuW2q+8rm/69Wc71YAWrTmYv5Z1e4gkWNby2QRHqa6FUM8zxFH1C8w8H0QygLe1WbiuAtwAEgteCj0NPTNQD65Knrcz8SeTdJudU4qslTEqLJUYxqxVDUDZRJNU7LzgjrXojbTJZO34Cvotq/730yUd9FbFzbnoCCNo+/nO/HkUwJIcP0b7qknDa4igbMvWV520zanltIDHWZ7d/xHPJNFJweixdb0uanmukxxIn9WncQ4N2pE8UJD6bbC3U1X57w=
+  - secure: ZDgIUvoRi64HRx7ePcfF0CwqasXB1dtoZDbSqfbOWShwMInegLtmmAU5LA02IyZeBBgk/kJwDZOdN13XaIDbop+GJf+6ooSEthA6Ni74kYYqYzTrEX7J6Z9c8y6MXmSQGAxlrjgCDV+BoBDT0XAwyk9MyC21vKhRYZ75kYA/J0CWpfLc8/7DVd430tarQgueejXzG1RLyKmWbAqlF2suJ+z69WRUEjcr3D7mJzuVhp2DrUCXwm7nY3yWuzBrxFiIWaw4vjvWpk2VuZNaksaBR+txJjsXAVkn/fFj7Ki+0YDyLt1qiFaK9z3zpsT/NTp/co5TI5BqQ8QZSLXI3ixfSo0/n7/DhazqWIGlJfm1R1vdwP5x8MFr4sBDbSbMOqdzjo52MTKy4vsD9xRkLtBjJIwnMStNa1nJcYVjwGNYalpqlk/2g1hkpbmaN7Qb3okvkMOtVaTGFfqyHucRukcqz/peyMmsK689MWQcfJStDG/y5HXuvTI5/d5x4DLgr6T0QWosJ7tHQV+sWS2XXcU8CBnTbFtvI77MWubyIjHUuwrtXzcAD4FtzgFbnEvZ4J8MFYWK6lk3JG0sBeSXNoXtNE+pH7To+5BbdxMYcuu9r/1lNxdH7jsu0JZE8WqtO/hIfCLhdpj3/vddxv3yoq1AwomSIeNdOjf6eSGe0z67ZSA=
