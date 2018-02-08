@@ -29,7 +29,7 @@ type context struct {
 func main() {
 	certificateArn := os.Getenv("CERTIFICATE_CONTROLLER_CERT_ARN")
 	if certificateArn == "" {
-		logrus.Error("Undefined certificate ARN. Please set environment variable CERTIFICATE_ARN")
+		logrus.Error("Undefined certificate ARN. Please set environment variable CERTIFICATE_CONTROLLER_CERT_ARN")
 		os.Exit(1)
 	}
 	controllerClass := os.Getenv("CERTIFICATE_CONTROLLER_CLASS")
