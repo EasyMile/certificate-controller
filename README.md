@@ -2,7 +2,7 @@
 
 ## Context
 
-A kubenretes controller for handling the
+A kubernetes controller for handling the
 `service.beta.kubernetes.io/aws-load-balancer-ssl-cert` annotation on
 services. This annotation allows kubernetes to bind an
 [ACM](https://aws.amazon.com/certificate-manager/) certificate to the
