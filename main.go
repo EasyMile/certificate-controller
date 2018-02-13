@@ -32,18 +32,20 @@ func main() {
 		logrus.Error("Undefined certificate ARN. Please set environment variable CERTIFICATE_CONTROLLER_CERT_ARN")
 		os.Exit(1)
 	}
+	logrus.WithFields(logrus.Fields{"arn": certificateArn}).Info("Certificate ARN found")
+
 	controllerClass := os.Getenv("CERTIFICATE_CONTROLLER_CLASS")
 	if controllerClass == "" {
 		logrus.WithFields(logrus.Fields{"owner-id": controllerClass}).Error("Undefined owner identifier. Using default")
 		controllerClass = "certificate-controller"
 	}
-	logrus.WithFields(logrus.Fields{"arn": certificateArn}).Info("Certificate ARN found")
-	var err error
+
 	clientSet, err := getClient()
 	if err != nil {
 		logrus.Error(err)
 		os.Exit(1)
 	}
+
 	context := context{
 		certificateArn:  certificateArn,
 		controllerClass: controllerClass,
@@ -88,33 +90,33 @@ func (context *context) handleServiceUpdate(old, current interface{}) {
 		context.reconcile(oldService, newService)
 	}
 }
+
 func (context *context) reconcile(old *core.Service, new *core.Service) {
-	if new == nil {
-		if old != nil {
-			logrus.WithFields(logrus.Fields{"action": "none", "namespace": old.Namespace, "new": old.Name}).Info("Service deleted")
-		} else {
-			logrus.WithFields(logrus.Fields{"action": "unknown"}).Warn("Unexpected call")
-		}
-	} else if context.hasControllingAnnotation(new) {
-		if new.Annotations[lbCertificateAnnotationKey] == context.certificateArn {
-			logrus.WithFields(logrus.Fields{"action": "none", "namespace": new.Namespace, "new": new.Name}).Info("No action needed")
-		} else if new.Annotations[lbCertificateAnnotationKey] == "" {
-			logrus.WithFields(logrus.Fields{"action": "add", "namespace": new.Namespace, "new": new.Name}).Info("Adding LoadBalancer annotation")
+	if new != nil {
+		if context.hasControllingAnnotation(new) {
 			context.updateAnnotation(new, context.certificateArn)
 		} else {
-			logrus.WithFields(logrus.Fields{"action": "update", "namespace": new.Namespace, "new": new.Name}).Info("Updating LoadBalancer annotation")
-			context.updateAnnotation(new, context.certificateArn)
+			logrus.WithFields(logrus.Fields{"action": "skip", "namespace": new.Namespace, "name": new.Name}).Info("No matching controller class on service. Skipping")
 		}
-	} else if old != nil {
-		if context.hasControllingAnnotation(old) {
-			logrus.WithFields(logrus.Fields{"action": "delete", "namespace": old.Namespace, "new": old.Name}).Info("Deleting LoadBalancer annotation")
-			context.updateAnnotation(new, "")
-		}
-	} else {
-		logrus.WithFields(logrus.Fields{"action": "skip", "namespace": new.Namespace, "new": new.Name}).Info("Controller class does not match. Skipping")
+		return
+	}
+
+	if old != nil && context.hasControllingAnnotation(old) {
+		logrus.WithFields(logrus.Fields{"action": "none", "namespace": old.Namespace, "name": old.Name}).Info("Managed service has been externally deleted")
 	}
 }
+
 func (context *context) updateAnnotation(service *core.Service, annotationValue string) {
+	switch service.Annotations[lbCertificateAnnotationKey] {
+	case context.certificateArn:
+		logrus.WithFields(logrus.Fields{"action": "none", "namespace": service.Namespace, "name": service.Name}).Info("ELB annotation up to date. No action needed")
+		return
+	case "":
+		logrus.WithFields(logrus.Fields{"action": "add", "namespace": service.Namespace, "name": service.Name}).Info("Adding LoadBalancer annotation")
+	default:
+		logrus.WithFields(logrus.Fields{"action": "update", "namespace": service.Namespace, "name": service.Name}).Info("Updating LoadBalancer annotation")
+	}
+
 	service.Annotations[lbCertificateAnnotationKey] = annotationValue
 	_, err := context.clientSet.CoreV1().Services(service.Namespace).Update(service)
 	if err != nil {
@@ -151,6 +153,7 @@ func isReconcileNeeded(newService *core.Service, oldService *core.Service) bool 
 	return hasAnnotationChanged(lbCertificateAnnotationKey, newService, oldService) ||
 		hasAnnotationChanged(controllerAnnotationKey, newService, oldService)
 }
+
 func hasAnnotationChanged(annotationKey string, newService *core.Service, oldService *core.Service) bool {
 	return newService.Annotations[annotationKey] != oldService.Annotations[annotationKey]
 }
