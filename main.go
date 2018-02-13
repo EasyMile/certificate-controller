@@ -109,7 +109,7 @@ func (context *context) reconcile(old *core.Service, new *core.Service) {
 func (context *context) updateAnnotation(service *core.Service, annotationValue string) {
 	switch service.Annotations[lbCertificateAnnotationKey] {
 	case context.certificateArn:
-		logrus.WithFields(logrus.Fields{"action": "none", "namespace": service.Namespace, "name": service.Name}).Info("ELB annotation uptodate. No action needed")
+		logrus.WithFields(logrus.Fields{"action": "none", "namespace": service.Namespace, "name": service.Name}).Info("ELB annotation up to date. No action needed")
 		return
 	case "":
 		logrus.WithFields(logrus.Fields{"action": "add", "namespace": service.Namespace, "name": service.Name}).Info("Adding LoadBalancer annotation")
