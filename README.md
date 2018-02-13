@@ -1,4 +1,4 @@
-# Certificate Controller
+# Certificate Controller [![Build Status](https://travis-ci.org/EasyMile/certificate-controller.svg?branch=master)](https://travis-ci.org/EasyMile/certificate-controller) [![Go ReportCard](https://goreportcard.com/badge/github.com/EasyMile/certificate-controller)](https://goreportcard.com/report/github.com/EasyMile/certificate-controller)
 
 ## Context
 
